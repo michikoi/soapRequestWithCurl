@@ -1,0 +1,47 @@
+<?php
+
+	//set the soap url and credentials
+	$url = "https://soapurl";
+	$user = "username";
+	$password = "password";
+
+        //soap request xml string
+	$xml_string = '<?xml version="1.0">
+		<soapenv:Envelope>
+		....
+		</soapenv:Envelope>';
+
+	$headers = array(
+			"Content-type: text/xml;charset=\"uft-8\"",
+			"Accept: text/xml",
+			"Cache-Control: no-cache",
+			"Pragma: no-cache",
+			"SOAPAction: https://soapurl",
+			"Content-length:".strlen($xml_string));
+			
+
+	     // PHP cURL  for https connection with authentication
+            $ch = curl_init();
+            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 1);
+            curl_setopt($ch, CURLOPT_URL, $url);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_USERPWD, $user.":".$password); 
+            curl_setopt($ch, CURLOPT_HTTPAUTH, CURLAUTH_ANY);
+            curl_setopt($ch, CURLOPT_TIMEOUT, 10);
+            curl_setopt($ch, CURLOPT_POST, true);
+            curl_setopt($ch, CURLOPT_POSTFIELDS, $xml_string); // the SOAP request
+            curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+
+            // converting
+            $response = curl_exec($ch); 
+            curl_close($ch);
+
+	     if(preg_match("/OK/i", $response)){
+			$result = "Output of curl is: <pre>".$response."</pre>";
+		}else{
+	
+			$result = "The curl cannot connect to soap URL Output of curl is: <pre>".$response;
+		}
+		
+		echo $result;
+?>
